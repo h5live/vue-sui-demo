@@ -13,7 +13,7 @@
     <a href="#withdraw" class="tab-link button">积分提现</a>
   </div>
   <div class="tabs">
-    <div id="system" class="content tab active" data-ptr-distance="55" v-pull-to-refresh>
+    <div id="system" class="content tab active" distance="55" v-pull-to-refresh="refresh">
       <div class="pull-to-refresh-layer">
         <div class="preloader"></div>
         <div class="pull-to-refresh-arrow"></div>
@@ -45,8 +45,8 @@ export default {
   methods: {
     refresh () {
       setTimeout(function () {
-        var cardNumber = $(this.$el).find('.card').length + 1
-        var cardHTML = '<div class="card">' +
+        let cardNumber = $(this.$el).find('.card').length + 1
+        let cardHTML = '<div class="card">' +
           '<div class="card-header">card' + cardNumber + '</div>' +
           '<div class="card-content">' +
           '<div class="card-content-inner">' +

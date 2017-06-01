@@ -1,39 +1,34 @@
+var config = require('../config')
 var webpack = require('webpack')
-var config = require('./webpack.base.conf')
+var merge = require('webpack-merge')
+var utils = require('./utils')
+var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
-var BrowserSyncPlugin = require('browser-sync-webpack-plugin')
-config.devtool = 'eval-source-map'
 
-// add hot-reload related code to entry chunk
-config.entry.app = [
-  'eventsource-polyfill',
-  'webpack-hot-middleware/client?quiet=true&reload=true',
-  config.entry.app
-]
+// add hot-reload related code to entry chunks
+Object.keys(baseWebpackConfig.entry).forEach(function (name) {
+  baseWebpackConfig.entry[name] = ['./build/dev-client'].concat(baseWebpackConfig.entry[name])
+})
 
-config.output.publicPath = '/'
-
-config.plugins = (config.plugins || []).concat([
-  new webpack.optimize.OccurenceOrderPlugin(),
-  new webpack.HotModuleReplacementPlugin(),
-  new webpack.NoErrorsPlugin(),
-  new HtmlWebpackPlugin({
-    filename: 'index.html',
-    template: 'src/index.html'
-  }),
-  new BrowserSyncPlugin(
-    // BrowserSync options
-    {
-      host: '127.0.0.1',
-      port: 8080,
-      proxy: 'http://127.0.0.1:8000/',
-      logConnections: false,
-      notify: false
-    },
-    // plugin options
-    {
-      reload: true
-  })
-])
-
-module.exports = config
+module.exports = merge(baseWebpackConfig, {
+  module: {
+    loaders: utils.styleLoaders()
+  },
+  // eval-source-map is faster for development
+  devtool: '#eval-source-map',
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': config.dev.env
+    }),
+    // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoErrorsPlugin(),
+    // https://github.com/ampedandwired/html-webpack-plugin
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: 'index.html',
+      inject: true
+    })
+  ]
+})
